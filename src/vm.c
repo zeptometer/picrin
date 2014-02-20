@@ -503,7 +503,16 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
       while (depth--) {
 	env = env->up;
       }
+#if GC_VISUALIZE
+      if (pic_vtype(env->values[c.u.r.idx]) == PIC_VTYPE_HEAP)
+	gomihiroi_log_deref(env, env->values[c.u.r.idx]);
+#endif
       env->values[c.u.r.idx] = POP();
+#if GC_VISUALIZE
+      if (pic_vtype(env->values[c.u.r.idx]) == PIC_VTYPE_HEAP)
+	gomihiroi_log_ref(env, env->values[c.u.r.idx]);
+#endif
+
       NEXT;
     }
     CASE(OP_JMP) {
@@ -610,10 +619,17 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
 	/* prepare env */
         ci->env = (struct pic_env *)pic_obj_alloc(pic, sizeof(struct pic_env), PIC_TT_ENV);
         ci->env->up = proc->env;
+#if GC_VISUALIZE
+	gomihiroi_log_ref(env, proc->env);
+#endif
         ci->env->valuec = proc->u.irep->cv_num;
         ci->env->values = (pic_value *)pic_calloc(pic, ci->env->valuec, sizeof(pic_value));
         for (i = 0; i < ci->env->valuec; ++i) {
           ci->env->values[i] = ci->fp[proc->u.irep->cv_tbl[i]];
+#if GC_VISUALIZE
+	  if (pic_vtype(ci->fp[proc->u.irep->cv_tbl[i]]) == PIC_VTYPE_HEAP)
+	    gomihiroi_log_ref(env, ci->fp[proc->u.irep->cv_tbl[i]]);
+#endif
         }
 
 	pic->ip = proc->u.irep->code;
@@ -668,6 +684,11 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
         pic_error(pic, "logic flaw");
       }
       proc = pic_proc_new_irep(pic, irep->irep[c.u.i], pic->ci->env);
+#if GC_VISUALIZE
+      gomihiroi_log_ref(env, proc);
+      gomihiroi_log_ref(env, proc);
+      gomihiroi_log_ref(env, proc);
+#endif
       PUSH(pic_obj_value(proc));
       pic_gc_arena_restore(pic, ai);
       NEXT;

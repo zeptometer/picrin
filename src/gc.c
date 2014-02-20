@@ -16,6 +16,10 @@
 #include "picrin/lib.h"
 #include "picrin/var.h"
 
+#if GC_VISUALIZE
+#include "GomiHiroi/server/gclog.h"
+#endif
+
 #if GC_DEBUG
 # include <string.h>
 #endif
@@ -740,6 +744,10 @@ pic_obj_alloc(pic_state *pic, size_t size, enum pic_tt tt)
   struct pic_object *obj;
 
   obj = pic_obj_alloc_unsafe(pic, size, tt);
+
+#if GC_VISUALIZE
+  gomihiroi_log_alooc(obj, tt);
+#endif
 
   gc_protect(pic, obj);
   return obj;
