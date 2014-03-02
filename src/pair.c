@@ -7,6 +7,10 @@
 #include "picrin.h"
 #include "picrin/pair.h"
 
+#if GC_VISUALIZE
+#include "GomiHiroi/server/gclog.h"
+#endif
+
 pic_value
 pic_cons(pic_state *pic, pic_value car, pic_value cdr)
 {
@@ -15,6 +19,14 @@ pic_cons(pic_state *pic, pic_value car, pic_value cdr)
   pair = (struct pic_pair *)pic_obj_alloc(pic, sizeof(struct pic_pair), PIC_TT_PAIR);
   pair->car = car;
   pair->cdr = cdr;
+
+#if GC_VISUALIZE
+  gomihiroi_log_alloc(pair, PIC_TT_PAIR);
+  if (pic_vtype(car) == PIC_VTYPE_HEAP)
+    gomihiroi_log_ref(pair, pic_ptr(car));
+  if (pic_vtype(cdr) == PIC_VTYPE_HEAP)
+    gomihiroi_log_ref(pair, pic_ptr(cdr));
+#endif
 
   return pic_obj_value(pair);
 }
@@ -235,6 +247,13 @@ pic_list_ref(pic_state *pic, pic_value list, int i)
 void
 pic_list_set(pic_state *pic, pic_value list, int i, pic_value obj)
 {
+#if GC_VISUALIZE
+  if (pic_vtype(pic_pair_ptr(pic_list_tail(pic, list, i))->car) == PIC_VTYPE_HEAP)
+    gomihiroi_log_deref(pic_ptr(pic_list_tail(pic, list, i)), pic_ptr(pic_pair_ptr(pic_list_tail(pic, list, i))->car));
+  if (pic_vtype(obj) == PIC_VTYPE_HEAP)
+    gomihiroi_log_ref(pic_ptr(pic_list_tail(pic, list, i)), pic_ptr(obj));
+#endif
+
   pic_pair_ptr(pic_list_tail(pic, list, i))->car = obj;
 }
 
@@ -339,6 +358,13 @@ pic_pair_set_car(pic_state *pic)
   if (! pic_pair_p(v))
     pic_error(pic, "pair expected");
 
+#if GC_VISUALIZE
+   if (pic_vtype(pic_pair_ptr(v)->car) == PIC_VTYPE_HEAP)
+     gomihiroi_log_deref(pic_ptr(v), pic_ptr(pic_pair_ptr(v)->car));
+   if (pic_vtype(w) == PIC_VTYPE_HEAP)
+     gomihiroi_log_ref(pic_ptr(v), pic_ptr(w));
+#endif
+
   pic_pair_ptr(v)->car = w;
   return pic_none_value();
 }
@@ -352,6 +378,13 @@ pic_pair_set_cdr(pic_state *pic)
 
   if (! pic_pair_p(v))
     pic_error(pic, "pair expected");
+
+#if GC_VISUALIZE
+  if (pic_vtype(pic_pair_ptr(v)->car) == PIC_VTYPE_HEAP)
+    gomihiroi_log_deref(pic_ptr(v), pic_ptr(pic_pair_ptr(v)->car));
+  if (pic_vtype(w) == PIC_VTYPE_HEAP)
+    gomihiroi_log_ref(pic_ptr(v), pic_ptr(w));
+#endif
 
   pic_pair_ptr(v)->cdr = w;
   return pic_none_value();
