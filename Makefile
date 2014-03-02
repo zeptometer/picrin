@@ -20,6 +20,9 @@ release: build
 debug: CFLAGS += -g -DDEBUG=1 -O0
 debug: build
 
+gc_visualize: CFLAGS += -DGC_VISUALIZE
+gc_visualize: build
+
 build: build-lib build-main
 
 build-main:

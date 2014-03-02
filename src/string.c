@@ -8,6 +8,10 @@
 #include "picrin/pair.h"
 #include "picrin/port.h"
 
+#if GC_VISUALIZE
+#include "extlib/GomiHiroi"
+#endif
+
 struct pic_string *
 pic_str_new(pic_state *pic, const char *cstr, size_t len)
 {

@@ -248,10 +248,13 @@ void
 pic_list_set(pic_state *pic, pic_value list, int i, pic_value obj)
 {
 #if GC_VISUALIZE
-  if (pic_vtype(pic_pair_ptr(pic_list_tail(pic, list, i))->car) == PIC_VTYPE_HEAP)
-    gomihiroi_log_deref(pic_ptr(pic_list_tail(pic, list, i)), pic_ptr(pic_pair_ptr(pic_list_tail(pic, list, i))->car));
-  if (pic_vtype(obj) == PIC_VTYPE_HEAP)
-    gomihiroi_log_ref(pic_ptr(pic_list_tail(pic, list, i)), pic_ptr(obj));
+  {
+    pic_value from = pic_list_tail(pic, list, i);
+    if (pic_vtype(pic_pair_ptr(from)->car) == PIC_VTYPE_HEAP)
+      gomihiroi_log_deref(pic_ptr(from), pic_ptr(pic_pair_ptr(from)->car));
+    if (pic_vtype(obj) == PIC_VTYPE_HEAP)
+      gomihiroi_log_ref(pic_ptr(from), pic_ptr(obj));
+  }
 #endif
 
   pic_pair_ptr(pic_list_tail(pic, list, i))->car = obj;
@@ -380,8 +383,8 @@ pic_pair_set_cdr(pic_state *pic)
     pic_error(pic, "pair expected");
 
 #if GC_VISUALIZE
-  if (pic_vtype(pic_pair_ptr(v)->car) == PIC_VTYPE_HEAP)
-    gomihiroi_log_deref(pic_ptr(v), pic_ptr(pic_pair_ptr(v)->car));
+  if (pic_vtype(pic_pair_ptr(v)->cdr) == PIC_VTYPE_HEAP)
+    gomihiroi_log_deref(pic_ptr(v), pic_ptr(pic_pair_ptr(v)->cdr));
   if (pic_vtype(w) == PIC_VTYPE_HEAP)
     gomihiroi_log_ref(pic_ptr(v), pic_ptr(w));
 #endif

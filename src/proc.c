@@ -28,6 +28,11 @@ pic_proc_new_irep(pic_state *pic, struct pic_irep *irep, struct pic_env *env)
   proc->cfunc_p = false;
   proc->u.irep = irep;
   proc->env = env;
+
+#if GC_VISUALIZE
+  gomihiroi_log_ref(proc, env);
+#endif
+
   return proc;
 }
 

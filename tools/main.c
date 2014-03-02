@@ -15,6 +15,11 @@
 # include <readline/history.h>
 #endif
 
+#if GC_VISUALIZE
+#include "extlib/GomiHiroi/server/gclog.h"
+#endif
+
+
 #define CODE_MAX_LENGTH 1024
 #define LINE_MAX_LENGTH 256
 
@@ -295,6 +300,10 @@ main(int argc, char *argv[], char **envp)
     import_repllib(pic);
   }
 
+#if GC_VISUALIZE
+  gomihiroi_initialize(1254);
+#endif
+
   switch (mode) {
   case NO_MODE:
     puts("logic flaw");
@@ -309,6 +318,10 @@ main(int argc, char *argv[], char **envp)
     exec_string(pic, script);
     break;
   }
+
+#if GC_VISUALIZE
+  gomihiroi_finalize();
+#endif
 
   pic_close(pic);
 

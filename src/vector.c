@@ -115,6 +115,14 @@ pic_vec_vector_set(pic_state *pic)
     pic_error(pic, "vector-set!: index out of range");
   }
   v->data[k] = o;
+
+#if GC_VISUALIZE
+  if (pic_vtype(v->data[k] == PIC_VTYPE_HEAP))
+    gomihiroi_log_deref(v, pic_ptr(v->data[k]));
+  if (pic_vtype(w) == PIC_VTYPE_HEAP)
+    gomihiroi_log_ref(v, pic_ptr(o));
+#endif
+
   return pic_none_value();
 }
 

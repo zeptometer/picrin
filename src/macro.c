@@ -20,6 +20,10 @@ senv_new(pic_state *pic, struct pic_senv *up)
   senv->up = up;
   senv->name = xh_new_int();
 
+#if GC_VISUALIZE
+  gomihiroi_log_ref(senv, up);
+#endif
+
   return senv;
 }
 
@@ -65,6 +69,12 @@ macro_new(pic_state *pic, struct pic_proc *proc, struct pic_senv *mac_env)
   mac = (struct pic_macro *)pic_obj_alloc(pic, sizeof(struct pic_macro), PIC_TT_MACRO);
   mac->senv = mac_env;
   mac->proc = proc;
+
+#if GC_VISUALIZE
+  gomihiroi_log_ref(mac, mac_env);
+  gomihiroi_log_ref(mac, proc);
+#endif
+
   return mac;
 }
 
@@ -76,6 +86,12 @@ sc_new(pic_state *pic, pic_value expr, struct pic_senv *senv)
   sc = (struct pic_sc *)pic_obj_alloc(pic, sizeof(struct pic_sc), PIC_TT_SC);
   sc->expr = expr;
   sc->senv = senv;
+
+#if GC_VISUALIZE
+  gomihiroi_log_ref(sc, expr);
+  gomihiroi_log_ref(sc, senv);
+#endif
+
   return sc;
 }
 
