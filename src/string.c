@@ -9,7 +9,7 @@
 #include "picrin/port.h"
 
 #if GC_VISUALIZE
-#include "extlib/GomiHiroi"
+#include "GomiHiroi/server/gclog.h"
 #endif
 
 struct pic_string *

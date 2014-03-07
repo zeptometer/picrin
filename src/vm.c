@@ -17,6 +17,10 @@
 
 #define GET_OPERAND(pic,n) ((pic)->ci->fp[(n)])
 
+#if GC_VISUALIZE
+#include "GomiHiroi/server/gclog.h"
+#endif
+
 struct pic_proc *
 pic_get_proc(pic_state *pic)
 {
@@ -505,12 +509,12 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
       }
 #if GC_VISUALIZE
       if (pic_vtype(env->values[c.u.r.idx]) == PIC_VTYPE_HEAP)
-	gomihiroi_log_deref(env, env->values[c.u.r.idx]);
+	gomihiroi_log_deref(env, pic_ptr(env->values[c.u.r.idx]));
 #endif
       env->values[c.u.r.idx] = POP();
 #if GC_VISUALIZE
       if (pic_vtype(env->values[c.u.r.idx]) == PIC_VTYPE_HEAP)
-	gomihiroi_log_ref(env, env->values[c.u.r.idx]);
+	gomihiroi_log_ref(env, pic_ptr(env->values[c.u.r.idx]));
 #endif
 
       NEXT;
@@ -620,7 +624,7 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
         ci->env = (struct pic_env *)pic_obj_alloc(pic, sizeof(struct pic_env), PIC_TT_ENV);
         ci->env->up = proc->env;
 #if GC_VISUALIZE
-	gomihiroi_log_ref(env, proc->env);
+	gomihiroi_log_ref(ci->env, proc->env);
 #endif
         ci->env->valuec = proc->u.irep->cv_num;
         ci->env->values = (pic_value *)pic_calloc(pic, ci->env->valuec, sizeof(pic_value));
@@ -628,7 +632,7 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
           ci->env->values[i] = ci->fp[proc->u.irep->cv_tbl[i]];
 #if GC_VISUALIZE
 	  if (pic_vtype(ci->fp[proc->u.irep->cv_tbl[i]]) == PIC_VTYPE_HEAP)
-	    gomihiroi_log_ref(env, ci->fp[proc->u.irep->cv_tbl[i]]);
+	    gomihiroi_log_ref(ci->env, pic_ptr(ci->fp[proc->u.irep->cv_tbl[i]]));
 #endif
         }
 
@@ -684,11 +688,6 @@ pic_apply(pic_state *pic, struct pic_proc *proc, pic_value argv)
         pic_error(pic, "logic flaw");
       }
       proc = pic_proc_new_irep(pic, irep->irep[c.u.i], pic->ci->env);
-#if GC_VISUALIZE
-      gomihiroi_log_ref(env, proc);
-      gomihiroi_log_ref(env, proc);
-      gomihiroi_log_ref(env, proc);
-#endif
       PUSH(pic_obj_value(proc));
       pic_gc_arena_restore(pic, ai);
       NEXT;

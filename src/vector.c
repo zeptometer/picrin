@@ -5,6 +5,10 @@
 #include "picrin.h"
 #include "picrin/pair.h"
 
+#if GC_VISUALIZE
+#include "GomiHiroi/server/gclog.h"
+#endif
+
 struct pic_vector *
 pic_vec_new(pic_state *pic, size_t len)
 {
@@ -117,9 +121,9 @@ pic_vec_vector_set(pic_state *pic)
   v->data[k] = o;
 
 #if GC_VISUALIZE
-  if (pic_vtype(v->data[k] == PIC_VTYPE_HEAP))
+  if (pic_vtype(v->data[k]) == PIC_VTYPE_HEAP)
     gomihiroi_log_deref(v, pic_ptr(v->data[k]));
-  if (pic_vtype(w) == PIC_VTYPE_HEAP)
+  if (pic_vtype(o) == PIC_VTYPE_HEAP)
     gomihiroi_log_ref(v, pic_ptr(o));
 #endif
 

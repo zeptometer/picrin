@@ -16,9 +16,8 @@
 #endif
 
 #if GC_VISUALIZE
-#include "extlib/GomiHiroi/server/gclog.h"
+#include "GomiHiroi/server/gclog.h"
 #endif
-
 
 #define CODE_MAX_LENGTH 1024
 #define LINE_MAX_LENGTH 256
@@ -292,6 +291,10 @@ main(int argc, char *argv[], char **envp)
 {
   pic_state *pic;
 
+#if GC_VISUALIZE
+  gomihiroi_initialize(5001);
+#endif
+
   pic = pic_open(argc, argv, envp);
 
   parse_opt(argc, argv);
@@ -299,10 +302,6 @@ main(int argc, char *argv[], char **envp)
   if (mode == INTERACTIVE_MODE || mode == ONE_LINER_MODE) {
     import_repllib(pic);
   }
-
-#if GC_VISUALIZE
-  gomihiroi_initialize(1254);
-#endif
 
   switch (mode) {
   case NO_MODE:

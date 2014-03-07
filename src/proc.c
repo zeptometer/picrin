@@ -7,6 +7,10 @@
 #include "picrin/proc.h"
 #include "picrin/irep.h"
 
+#if GC_VISUALIZE
+#include "GomiHiroi/server/gclog.h"
+#endif
+
 struct pic_proc *
 pic_proc_new(pic_state *pic, pic_func_t cfunc)
 {

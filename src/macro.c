@@ -8,6 +8,10 @@
 #include "picrin/macro.h"
 #include "picrin/lib.h"
 
+#if GC_VISUALIZE
+#include "GomiHiroi/server/gclog.h"
+#endif
+
 static pic_value macroexpand(pic_state *, pic_value, struct pic_senv *);
 static pic_value macroexpand_list(pic_state *, pic_value, struct pic_senv *);
 
@@ -88,7 +92,8 @@ sc_new(pic_state *pic, pic_value expr, struct pic_senv *senv)
   sc->senv = senv;
 
 #if GC_VISUALIZE
-  gomihiroi_log_ref(sc, expr);
+  if (pic_vtype(expr) == PIC_VTYPE_HEAP)
+    gomihiroi_log_ref(sc, pic_ptr(expr));
   gomihiroi_log_ref(sc, senv);
 #endif
 
