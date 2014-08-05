@@ -72,12 +72,11 @@ pic_record_record_p(pic_state *pic)
 static pic_value
 pic_record_record_of(pic_state *pic)
 {
-  struct pic_record *rec;
-  pic_value rectype;
+  pic_value obj, rectype;
 
-  pic_get_args(pic, "ro", &rec, &rectype);
+  pic_get_args(pic, "oo", &obj, &rectype);
 
-  return pic_bool_value(pic_record_of(pic, rec, rectype));
+  return pic_bool_value(pic_record_p(obj) && pic_record_of(pic, pic_record_ptr(obj), rectype));
 }
 
 static pic_value
